@@ -15,6 +15,7 @@ router.route('/:event').get( async(req, res, next) => {
     try{
         let _event = req.params.event;
         let _frdate = req.query.frdate;
+        
         //let _projection = {_id:0,contact_year:1,u_customer_no:1,customer_name:1,contact_information:1,contact_start_date:1, contact_count:1};
         let matchpipe = {$match:{"contact_start_date": {$gte:_frdate}}};
         let match = "";
