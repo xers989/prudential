@@ -29,7 +29,7 @@ router.route('/:event').get( async(req, res, next) => {
             match = {$match:{"contact_information.contact_type":"실시간이벤트정보"}}
         else if (_event == "C")
             match = {$match:{"contact_information.contact_type":"고객정보제공통지"}}
-        else if (_event == "E")
+        else if (_event == "D")
             match = {$match:{"contact_information.contact_type":"디지털로그정보"}}
         else if (_event == "E")
             match = {$match:{"contact_information.contact_type":"상담접촉정보"}}
