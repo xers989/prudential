@@ -71,7 +71,7 @@ router.route('/').get( async(req, res, next) => {
         const strToday = today.getFullYear()+"-"+('0' + (today.getMonth() + 1)).slice(-2)+"-"+('0' + today.getDate()).slice(-2);
         const contact_no = Math.floor(today.getTime() / 1000)
 
-        query = {u_customer_no:contactDoc.u_customer_no, contact_count: {$lte:1000}};
+        query = {u_customer_no:contactDoc.u_customer_no, contact_count: {$lte:10}};
         
         await customerCollection.updateOne(
             query,
@@ -90,6 +90,46 @@ router.route('/').get( async(req, res, next) => {
         console.error(err);
         next(err);
     } 
+});
+
+
+router.route('/all/:customer').get( async(req, res, next) => {
+    try{
+        let query = "";
+        let _customer = parseInt(req.params.customer);
+    
+
+        await client.connect();
+        const database = client.db(databasename);
+        const customerCollection = database.collection("contact");
+        query = {"u_customer_no":_customer};
+
+        const cursor = await customerCollection.find(query);
+        
+        const results = await cursor.toArray();
+
+        let outcomes = '';
+        if (results.length > 0) {
+            results.forEach((result, i) => {
+                outcomes += JSON.stringify(result);
+                //console.log(result);
+            });
+        } else {
+            console.log('No Data');
+        }
+
+        res.status(200).json(results);
+
+    } catch(e)
+    {
+        console.log("Error");
+        console.error(e);
+        res.status(404).json({});
+
+    }
+    finally{
+        await client.close();
+    }   
 });
 
 router.route('/:customer/:event').get( async(req, res, next) => {
@@ -158,6 +198,7 @@ router.route('/:customer/:event').get( async(req, res, next) => {
     }   
 })
 
+
 router.route('/:customer').get( async(req, res, next) => {
     try{
         let query = "";
@@ -206,36 +247,6 @@ router.route('/:customer').get( async(req, res, next) => {
     finally{
         await client.close();
     }   
-})
-.delete(async (req, res, next) => {
-    console.log("Delete is going")
-    try{
-
-        let _customer = parseInt(req.params.customer);
-        await client.connect();
-        let _contact_start_date = req.query.contact_start_date;
-        let _contact_type = req.query.contact_type;
-        let _occur_date = req.query.occur_date;
-
-        let _delete_address = {$pull: {contact_information: {contact_type:_contact_type, occur_date:_occur_date}}, $inc:{contact_count:-1}};
-
-        const database = client.db(databasename);
-        const customerCollection = database.collection("contact");
-
-        query = {u_customer_no: _customer, contact_start_date:_contact_start_date};
-        console.log("Query:"+JSON.stringify(query));
-        
-        await customerCollection.updateOne(
-            query,_delete_address
-          );
-
-        console.log("POST log");
-        res.status(201).json(query);
-    }catch (err)
-    {
-        console.error(err);
-        next(err);
-    } 
 });
 
 module.exports = router;
