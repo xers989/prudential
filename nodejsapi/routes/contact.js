@@ -97,9 +97,11 @@ router.route('/:customer/:event').get( async(req, res, next) => {
         let query = "";
         let _customer = parseInt(req.params.customer);
         let _event = req.params.event;
+        let _frdate = req.query.frdate;
         let _projection = {_id:0,contact_year:1,u_customer_no:1,customer_name:1,contact_information:1,contact_start_date:1, contact_count:1};
         query = {u_customer_no:_customer, contact_count: {$lte:1000}};
         let match = "";
+
 
         await client.connect();
         const database = client.db(databasename);
@@ -119,7 +121,7 @@ router.route('/:customer/:event').get( async(req, res, next) => {
             match = {$match:{"contact_information.contact_type":"안내장발송정보"}}
 
         let pipeline = [
-            {$match:{"u_customer_no":_customer,"contact_start_date": {$gte:"2020-02-23"}}},
+            {$match:{"u_customer_no":_customer,"contact_start_date": {$gte:_frdate}}},
             {$unwind:'$contact_information'},
             match,
             {'$sort':{'contact_information.occur_date':1}}
@@ -160,16 +162,25 @@ router.route('/:customer').get( async(req, res, next) => {
     try{
         let query = "";
         let _customer = parseInt(req.params.customer);
-        let _projection = {_id:0,contact_year:1,u_customer_no:1,customer_name:1,contact_information:1,contact_start_date:1, contact_count:1};
-        query = {u_customer_no:_customer, contact_count: {$lte:1000}};
+        
+        let _frdate = req.query.frdate;
+        //let _projection = {_id:0};
+        query = {};
 
         await client.connect();
         const database = client.db(databasename);
         const customerCollection = database.collection("contact");
 
-        console.log("Query:"+JSON.stringify(query));
+        let pipeline = [
+            {$match:{"u_customer_no":_customer,"contact_start_date": {$gte: _frdate}}},
+            {$unwind:'$contact_information'},
+            {'$sort':{'contact_information.occur_date':1}}
+          ];
+        
+        console.log("pipeline:"+JSON.stringify(pipeline));
 
-        const cursor = await customerCollection.find(query).project(_projection);
+        const cursor = await customerCollection.aggregate(pipeline);
+        
         
         const results = await cursor.toArray();
 
