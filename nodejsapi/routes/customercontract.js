@@ -111,6 +111,37 @@ router.route('/:customer/:instrument/contract').post(async (req, res, next) => {
     } 
 });
 
+router.route('/:customer/:instrument/claim').post(async (req, res, next) => {
+    console.log("POST Update Existing")
+    try{
+        let query = "";
+        let _instrument = req.params.instrument;
+        let _customer = parseInt(req.params.customer);
+        //let _projection = {_id:0,u_customer_no:1,customer_name:1,request_customer_destroy_id:1,request_customer_destroy_date:1,request_customer_destroy_channel:1,request_customer_destroy_process:1};
+        let _projection = {_id:0};
+        query = {u_customer_no:_customer, instrument_no: _instrument };
+        const exampleDocument = req.body;
+
+        await client.connect();
+        
+        let _update_contract = {$push: exampleDocument};
+        
+        const database = client.db(databasename);
+        const customerCollection = database.collection("customer_contract");
+        
+        await customerCollection.updateOne(
+            query,_update_contract
+          );
+
+        console.log("POST log");
+        res.status(201).json(query);
+    }catch (err)
+    {
+        console.error(err);
+        next(err);
+    } 
+});
+
 
 router.route('/:customer/:instrument').get( async(req, res, next) => {
     try{
