@@ -299,7 +299,15 @@ router.route('/:customer/process').get( async(req, res, next) => {
     try{
         let query = "";
         let _customer = parseInt(req.params.customer);
-        let _destroy_id = req.query.destroy_id;
+        if (req.query.destroy_id != null) {
+            let _destroy_id = req.query.destroy_id;
+            query = {u_customer_no:_customer, request_customer_destroy_id: _destroy_id};
+        }
+        else
+        {
+            query = {u_customer_no:_customer};
+        }
+
         let _projection = {_id:0,u_customer_no:1,customer_name:1,request_customer_destroy_id:1,request_customer_destroy_date:1,request_customer_destroy_channel:1,request_customer_destroy_process:1,request_customer_destroy_process:1};
         //let _projection = {_id:0};
         //query = {u_customer_no:_customer};
@@ -310,7 +318,7 @@ router.route('/:customer/process').get( async(req, res, next) => {
         const database = client.db(databasename);
         const customerCollection = database.collection("customer_destroy");
 
-        query = {u_customer_no:_customer, request_customer_destroy_id: _destroy_id};
+        //query = {u_customer_no:_customer, request_customer_destroy_id: _destroy_id};
 
         console.log("/customer/process Query:"+JSON.stringify(query));
 
