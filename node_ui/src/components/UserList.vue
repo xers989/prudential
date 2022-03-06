@@ -205,7 +205,7 @@ export default {
             userData["process_owner"]         = result.customer_manage_history[i].process_owner;
             userList.push(userData);
           }
-          console.log("userData GET:"+ JSON.stringify(userData));
+          console.log("userData GET:"+ JSON.stringify(userList));
           this.userList = userList;
         });
     },
