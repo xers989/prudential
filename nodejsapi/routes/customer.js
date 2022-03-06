@@ -71,7 +71,7 @@ router.route('/').get( async(req, res, next) => {
         const customerCollection = database.collection("customers");
      
         await customerCollection.insertOne(
-            query
+            exampleDocument
           );
 
         console.log("POST log");
