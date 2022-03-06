@@ -8,8 +8,8 @@ import "./assets/styles.scss";
 
 Vue.config.productionTip = false
 
-//axios.defaults.baseURL = 'http://10.0.0.62:3000'
-axios.defaults.baseURL = 'http://api.myjson.site:3000'
+axios.defaults.baseURL = 'http://10.0.0.62:3000'
+//axios.defaults.baseURL = 'http://api.myjson.site:3000'
 axios.defaults.headers.post["Content-Type"] = "application/json";
 axios.defaults.headers.get["Content-Type"] = "application/json";
 
