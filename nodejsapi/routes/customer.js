@@ -304,7 +304,6 @@ router.route('/:customer/history').get( async(req, res, next) => {
 .delete(async (req, res, next) => {
     console.log("Delete is going")
     try{
-
         let _customer = parseInt(req.params.customer);
         await client.connect();
         let _customer_manage_type = req.query.manage_type;
