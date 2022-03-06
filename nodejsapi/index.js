@@ -13,6 +13,7 @@ const contactRouter = require('./routes/contact');
 const eventRouter = require('./routes/event');
 const destoryRouter = require('./routes/destroy');
 const contractRouter = require('./routes/customercontract');
+const serviceRouter = require('./routes/service');
 
 const app = express();
 app.use(cors());
@@ -24,6 +25,7 @@ app.use('/contact',contactRouter);
 app.use('/event',eventRouter);
 app.use('/destroy',destoryRouter);
 app.use('/contract',contractRouter);
+app.use('/service',serviceRouter);
 
 app.set ('port', process.env.PORT || 3000);
 nunjuncks.configure('views', {

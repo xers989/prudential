@@ -58,49 +58,31 @@ router.route('/').get( async(req, res, next) => {
     finally{
         await client.close();
     }   
-});
-
-router.route('/:customer').get( async(req, res, next) => {
+})
+.post(async (req, res, next) => {
+    console.log("Customer Post is going")
     try{
-        let query = "";
-        let _customer = parseInt(req.params.customer);
-        let _projection = {_id:0,u_customer_no:1,person_group_coode:1,customer_name:1,address:1, group_customer_relation:1,u_customer_identity:1,customerBasic:1};
-        query = {u_customer_no:_customer};
-
+        console.log("Request:"+ JSON.stringify(req.body));
+    
         await client.connect();
+        const exampleDocument = req.body;
+
         const database = client.db(databasename);
         const customerCollection = database.collection("customers");
+     
+        await customerCollection.insertOne(
+            query
+          );
 
-
-        console.log("Query:"+JSON.stringify(query));
-
-        const cursor = await customerCollection.find(query).project(_projection);
-        
-        const results = await cursor.toArray();
-
-        let outcomes = '';
-        if (results.length > 0) {
-            results.forEach((result, i) => {
-                outcomes += JSON.stringify(result);
-                //console.log(result);
-            });
-        } else {
-            console.log('No Data');
-        }
-
-        res.status(200).json(results);
-
-    } catch(e)
+        console.log("POST log");
+        res.status(201).json(exampleDocument);
+    }catch (err)
     {
-        console.log("Error");
-        console.error(e);
-        res.status(404).json({});
-
-    }
-    finally{
-        await client.close();
-    }   
+        console.error(err);
+        next(err);
+    } 
 });
+
 
 router.route('/:customer/address').get( async(req, res, next) => {
     try{
@@ -345,5 +327,75 @@ router.route('/:customer/history').get( async(req, res, next) => {
         next(err);
     } 
 });
+
+router.route('/:customer').get( async(req, res, next) => {
+    try{
+        let query = "";
+        let _customer = parseInt(req.params.customer);
+        let _projection = {_id:0,u_customer_no:1,person_group_coode:1,customer_name:1,address:1, group_customer_relation:1,u_customer_identity:1,customerBasic:1};
+        query = {u_customer_no:_customer};
+
+        await client.connect();
+        const database = client.db(databasename);
+        const customerCollection = database.collection("customers");
+
+
+        console.log("Query:"+JSON.stringify(query));
+
+        const cursor = await customerCollection.find(query).project(_projection);
+        
+        const results = await cursor.toArray();
+
+        let outcomes = '';
+        if (results.length > 0) {
+            results.forEach((result, i) => {
+                outcomes += JSON.stringify(result);
+                //console.log(result);
+            });
+        } else {
+            console.log('No Data');
+        }
+
+        res.status(200).json(results);
+
+    } catch(e)
+    {
+        console.log("Error");
+        console.error(e);
+        res.status(404).json({});
+
+    }
+    finally{
+        await client.close();
+    }   
+})
+.patch(async (req, res, next) => {
+    console.log("Patch is going")
+    try{
+        console.log("Request:"+ JSON.stringify(req.body));
+    
+        let _customer = parseInt(req.params.customer);
+        await client.connect();
+        const exampleDocument = req.body;
+
+        const database = client.db(databasename);
+        const customerCollection = database.collection("customers");
+
+        query = {u_customer_no: _customer};
+        
+        await customerCollection.updateOne(
+            query,
+            { $set: exampleDocument}
+          );
+
+        console.log("POST log");
+        res.status(201).json(exampleDocument);
+    }catch (err)
+    {
+        console.error(err);
+        next(err);
+    } 
+});
+
 
 module.exports = router;
