@@ -395,7 +395,30 @@ router.route('/:customer').get( async(req, res, next) => {
         console.error(err);
         next(err);
     } 
-});
+})
+.delete(async (req, res, next) => {
+    console.log("Customer Delete is going")
+    try{
 
+        let _customer = parseInt(req.params.customer);
+        await client.connect();
+
+        const database = client.db(databasename);
+        const customerCollection = database.collection("customers");
+
+        query = {u_customer_no: _customer};
+        
+        await customerCollection.deleteOne(
+            query
+          );
+
+        console.log("Delete log");
+        res.status(201).json(query);
+    }catch (err)
+    {
+        console.error(err);
+        next(err);
+    } 
+});
 
 module.exports = router;
