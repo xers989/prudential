@@ -61,17 +61,17 @@ router.route('/').get( async(req, res, next) => {
     console.log("root Post is going")
     try{
         await client.connect();
-        const contractDoc = req.body;
+        const customerDoc = req.body;
 
         const database = client.db(databasename);
         const serviceCollection = database.collection("customer_service");
         
         await serviceCollection.insertOne(
-            contractDoc
+            customerDoc
           );
 
         console.log("POST log");
-        res.status(201).json(contractDoc);
+        res.status(201).json(customerDoc);
     }catch (err)
     {
         console.error(err);
