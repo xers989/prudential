@@ -276,9 +276,6 @@ router.route('/:customer/:service/detail/').get( async(req, res, next) => {
 
         let delete_query = {$pull: {service_detail: {detail_date:_date}}};
 
-          const database = client.db(databasename);
-          const customerCollection = database.collection("customers");
-  
           query = {u_customer_no: _customer};
           
           await customerCollection.updateOne(
