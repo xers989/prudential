@@ -7,19 +7,9 @@
   >
     <template v-slot:top>
       <v-toolbar flat>
-        <v-toolbar-title>고객 이력 사항 관리</v-toolbar-title>
-        <v-divider class="mx-4" insert vertical></v-divider>
-        <p>통합고객번호</p> <v-spacer></v-spacer> <h3>{{uCustomerNo}}</h3>
-        <v-spacer></v-spacer>
-      <p>고객 이름</p><h3>{{customerName}}</h3>
-        <v-spacer></v-spacer>
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="통합고객번호"
-          single-line
-          hide-details
-        ></v-text-field>
+        <v-toolbar-title>고객 이력 사항 관리 </v-toolbar-title>
+        
+       
         <v-spacer></v-spacer>
 
         <v-dialog v-model="dialog" max-width="500px">
@@ -129,13 +119,85 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-
-
       </v-toolbar>
+      <v-container fluid>
+        <!--v-row no-gutters>
+          <v-col cols=1>
+            <v-subheader>통합고객번호</v-subheader>
+          </v-col>
+          <v-col cols=1>
+            <h4>{{uCustomerNo}}</h4>
+          </v-col>
+          <v-divider vertical></v-divider>
+          <v-col cols=1 class=ml-10>
+            고객 이름
+          </v-col>
+          <v-col cols=1>
+            <h4>{{customerName}}</h4>
+          </v-col>
+        </v-row-->
+        <!--v-row no-gutters>
+          <v-card width="130px" height="80px">
+            <v-card-text>
+              <div>통합고객번호</div>
+              <p class="text-h5 text--primary">
+                {{uCustomerNo}}
+              </p>
+            </v-card-text>
+          </v-card>
+           <v-card class="pa-0, ml-2" width="150px" height="80px">
+             <v-card-text>
+              <div>고객 이름</div>
+              <p class="text-h5 text--primary">
+                {{customerName}}
+              </p>
+            </v-card-text>
+          </v-card>
+        </v-row-->
+         <v-row no-gutters>
+
+          <v-col>
+              <v-text-field
+                  v-model="search_customer_no"
+                  counter="5"
+                  hint="통합 고객 번호를 입력하세요"
+                  label="통합고객번호">
+              </v-text-field>
+          </v-col>
+          <v-col>
+              <v-btn
+              class="ma-2"
+              outlined
+              color="indigo"
+              @click="search">
+            검색
+              </v-btn>
+          </v-col>
+        </v-row>
+
+        <v-row no-gutters>
+
+          <v-col cols=12>
+            <v-chip
+              class="ma-2"
+              color="primary"
+              outlined
+            >통합고객번호
+            </v-chip> {{uCustomerNo}}
+            <v-chip
+              class="ma-2"
+              color="success"
+              outlined
+            >고객 이름
+            </v-chip> {{customerName}}
+          </v-col>
+
+        </v-row>
+        <v-spacer></v-spacer>
+      
+      </v-container>
     </template>
-
-
-
+    
     <template v-slot:item.customer_manage_type="{ item }">
       <v-chip @click="detailItem(item)" :color="getColor(item.customer_manage_type)" dark>
         {{ item.customer_manage_type }}
@@ -154,12 +216,12 @@ export default {
   name: "UserInfoList",
   data() {
     return {
-      search: "",
       editMode: false,
       dialog: false,
       dialogDelete: false,
       uCustomerNo: "",
       customerName : "",
+      search_customer_no: "1",
       headers: [
         { text: "고객정보관리유형", value: "customer_manage_type" },
         { text: "관리대상정보", value: "manage_target" },
@@ -209,26 +271,31 @@ export default {
       console.log("listUserInfo");
 
       this.$axios
-        .get("/customer/1/history/")
+        .get("/customer/"+this.search_customer_no+"/history/")
         .then((result) => {
           const res_data = result.data;
           console.log("userData GET:"+ JSON.stringify(res_data));
           this.uCustomerNo = res_data[0].u_customer_no;
           this.customerName = res_data[0].customer_name;
 
+          
           for (let i = 0; i < res_data.length; i++) {
-              for (let j = 0; j < res_data[i].customer_manage_history.length; j++) {
-                const history = res_data[i].customer_manage_history[j];
-                let userData = {};
-                console.log("RES Item : "+JSON.stringify(history));
-                userData["customer_manage_type"]  = history.customer_manage_type;
-                userData["manage_target"]         = history.manage_target;
-                userData["manage_event"]          = history.manage_event;
-                userData["event_channel"]         = history.event_channel;
-                userData["process_date"]          = history.process_date;
-                userData["process_owner"]         = history.process_owner;
-                userList.push(userData);
-                console.log("userData GET:"+ JSON.stringify(userData));
+              if (res_data[i].customer_manage_history != null) { 
+                for (let j = 0; j < res_data[i].customer_manage_history.length; j++) {
+                  const history = res_data[i].customer_manage_history[j];
+                  let userData = {};
+                  console.log("RES Item : "+JSON.stringify(history));
+                  userData["customer_manage_type"]  = history.customer_manage_type;
+                  userData["manage_target"]         = history.manage_target;
+                  userData["manage_event"]          = history.manage_event;
+                  userData["event_channel"]         = history.event_channel;
+                  userData["process_date"]          = history.process_date;
+                  userData["process_owner"]         = history.process_owner;
+                  userList.push(userData);
+                  console.log("userData GET:"+ JSON.stringify(userData));
+                }
+              }else{
+                userList = [];
               }
           }
           this.userList = userList;
@@ -259,12 +326,16 @@ export default {
 
       console.log(this.editedItem);
       this.$axios
-          .delete("/customer/1/history?manage_type="+this.editedItem.customer_manage_type)
+          .delete("/customer/"+this.search_customer_no+"/history?manage_type="+this.editedItem.customer_manage_type)
           .then((result) => {
             console.log(result);
             this.listUserInfo();
           });
       this.closeDelete();
+    },
+    search() {
+      this.listUserInfo();
+console.log("Gogogogo Search"+ this.search_customer_no);
     },
 
     close() {
@@ -297,7 +368,7 @@ export default {
 
       if (this.editedIndex > -1) {
         this.$axios
-          .patch("/customer/1/history/?manage_type="+this.editedItem.customer_manage_type, jsonBody)
+          .patch("/customer/"+this.search_customer_no+"/history/?manage_type="+this.editedItem.customer_manage_type, jsonBody)
           .then((result) => {
             console.log("IF:"+result);
             //Object.assign(this.shipList[this.editedIndex], this.editedItem);
