@@ -26,7 +26,7 @@
             <v-list-item-avatar>
               <img
                 src="https://cdn.vuetifyjs.com/images/john.jpg"
-                alt="John"
+                alt="Kyudong"
               >
             </v-list-item-avatar>
 
@@ -62,6 +62,7 @@ export default {
     }),
   methods: {
     signout () {
+      console.log("Sign out");
       sessionStorage.clear();
        this.$router.push({name: 'signIn'});
     }

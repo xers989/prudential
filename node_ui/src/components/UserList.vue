@@ -3,23 +3,34 @@
     class="pl-10 pr-10"
     :headers="headers"
     :items="userList"
+    :search="search"
   >
     <template v-slot:top>
       <v-toolbar flat>
         <v-toolbar-title>고객 이력 사항 관리</v-toolbar-title>
         <v-divider class="mx-4" insert vertical></v-divider>
-
+        <p>통합고객번호</p> <v-spacer></v-spacer> <h3>{{uCustomerNo}}</h3>
         <v-spacer></v-spacer>
-
+      <p>고객 이름</p><h3>{{customerName}}</h3>
+        <v-spacer></v-spacer>
+        <v-text-field
+          v-model="search"
+          append-icon="mdi-magnify"
+          label="통합고객번호"
+          single-line
+          hide-details
+        ></v-text-field>
+        <v-spacer></v-spacer>
 
         <v-dialog v-model="dialog" max-width="500px">
           <template v-slot:activator="{ on, attrs }">
             
             <v-btn color="blue-grey" v-bind="attrs" v-on="on">
-              <span style="color: white">New</span>
+              <span style="color: white">신규</span>
             </v-btn>
             
           </template>
+
           <v-card>
             <v-card-title>
               <span class="text-h5">{{ formTitle }}</span>
@@ -95,8 +106,8 @@
 
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="close"> Cancel </v-btn>
-              <v-btn v-if="editMode" color="blue darken-1" text @click="save"> Save </v-btn>
+              <v-btn color="blue darken-1" text @click="close">취소 </v-btn>
+              <v-btn v-if="editMode" color="blue darken-1" text @click="save"> 저장 </v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -143,9 +154,12 @@ export default {
   name: "UserInfoList",
   data() {
     return {
+      search: "",
       editMode: false,
       dialog: false,
       dialogDelete: false,
+      uCustomerNo: "",
+      customerName : "",
       headers: [
         { text: "고객정보관리유형", value: "customer_manage_type" },
         { text: "관리대상정보", value: "manage_target" },
@@ -163,11 +177,12 @@ export default {
       }
   },
   created() {
+    console.log("created");
     this.listUserInfo();
   },
   computed: {
     formTitle() {
-      return (this.editedIndex === -1 && this.editMode) ? "New User" : (this.editedIndex > -1 && this.editMode) ? "Edit User" : "Detail User";
+      return (this.editedIndex === -1 && this.editMode) ? "New History" : (this.editedIndex > -1 && this.editMode) ? "Edit History" : "Detail History";
     },
     isReadonly() {
       return this.editMode ? false : true;
@@ -184,29 +199,40 @@ export default {
   },
   methods: {
     getColor (calories) {
-        if (calories > 400) return 'red'
-        else if (calories > 200) return 'orange'
+        if (calories == 'A') return 'red'
+        else if (calories == 'B') return 'orange'
         else return 'green'
       },
     listUserInfo() {
+      console.log("start");
       let userList = [];
       console.log("listUserInfo");
 
       this.$axios
         .get("/customer/1/history/")
         .then((result) => {
-          for (let i = 0; i < result.customer_manage_history.length; i++) {
-            let userData = {};
-            userData["customer_manage_type"]  = result.customer_manage_history[i].customer_manage_type;
-            userData["manage_target"]         = result.customer_manage_history[i].name.manage_target;
-            userData["manage_event"]          = result.customer_manage_history[i].name.manage_event;
-            userData["event_channel"]         = result.customer_manage_history[i].event_channel;
-            userData["process_date"]          = result.customer_manage_history[i].process_date;
-            userData["process_owner"]         = result.customer_manage_history[i].process_owner;
-            userList.push(userData);
+          const res_data = result.data;
+          console.log("userData GET:"+ JSON.stringify(res_data));
+          this.uCustomerNo = res_data[0].u_customer_no;
+          this.customerName = res_data[0].customer_name;
+
+          for (let i = 0; i < res_data.length; i++) {
+              for (let j = 0; j < res_data[i].customer_manage_history.length; j++) {
+                const history = res_data[i].customer_manage_history[j];
+                let userData = {};
+                console.log("RES Item : "+JSON.stringify(history));
+                userData["customer_manage_type"]  = history.customer_manage_type;
+                userData["manage_target"]         = history.manage_target;
+                userData["manage_event"]          = history.manage_event;
+                userData["event_channel"]         = history.event_channel;
+                userData["process_date"]          = history.process_date;
+                userData["process_owner"]         = history.process_owner;
+                userList.push(userData);
+                console.log("userData GET:"+ JSON.stringify(userData));
+              }
           }
-          console.log("userData GET:"+ JSON.stringify(userList));
           this.userList = userList;
+          console.log("userList : "+JSON.stringify(userList));
         });
     },
     detailItem(item) {
@@ -242,6 +268,7 @@ export default {
     },
 
     close() {
+      console.log("Close");
       this.dialog = false;
       this.$nextTick(() => {
         this.editedItem = Object.assign({}, this.defaultItem);
@@ -270,9 +297,9 @@ export default {
 
       if (this.editedIndex > -1) {
         this.$axios
-          .post("/customer/1/history/", jsonBody)
+          .patch("/customer/1/history/?manage_type="+this.editedItem.customer_manage_type, jsonBody)
           .then((result) => {
-            console.log(result);
+            console.log("IF:"+result);
             //Object.assign(this.shipList[this.editedIndex], this.editedItem);
             this.listUserInfo();
 
@@ -282,7 +309,7 @@ export default {
         this.$axios
           .post("/customer/1/history/", jsonBody)
           .then((result) => {
-            console.log(result);
+            console.log("ELSE:"+result);
             this.listUserInfo();
             //this.shipList.push(this.editedItem);
           });
