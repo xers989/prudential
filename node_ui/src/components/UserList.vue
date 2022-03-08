@@ -379,7 +379,7 @@ console.log("Gogogogo Search"+ this.search_customer_no);
           });
       } else {
         this.$axios
-          .post("/customer/1/history/", jsonBody)
+          .post("/customer/"+this.search_customer_no+"/history/", jsonBody)
           .then((result) => {
             console.log("ELSE:"+result);
             this.listUserInfo();
