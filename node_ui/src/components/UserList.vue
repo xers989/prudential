@@ -240,7 +240,7 @@ export default {
   },
   created() {
     console.log("created");
-    this.listUserInfo();
+    //this.listUserInfo();
   },
   computed: {
     formTitle() {
@@ -261,8 +261,9 @@ export default {
   },
   methods: {
     getColor (calories) {
-        if (calories == 'A') return 'red'
-        else if (calories == 'B') return 'orange'
+        if (calories == '유형1') return 'red'
+        else if (calories == '유형2') return 'orange'
+        else if (calories == '유형3') return 'blue'
         else return 'green'
       },
     listUserInfo() {
