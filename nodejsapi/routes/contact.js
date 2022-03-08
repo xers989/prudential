@@ -71,7 +71,7 @@ router.route('/').get( async(req, res, next) => {
         const strToday = today.getFullYear()+"-"+('0' + (today.getMonth() + 1)).slice(-2)+"-"+('0' + today.getDate()).slice(-2);
         const contact_no = Math.floor(today.getTime() / 1000)
 
-        query = {u_customer_no:contactDoc.u_customer_no, contact_count: {$lte:10}};
+        query = {u_customer_no:contactDoc.u_customer_no, contact_count: {$lt:10}};
         
         await customerCollection.updateOne(
             query,
