@@ -1,6 +1,6 @@
 <template>
   <v-app-bar app elevate-on-scroll>
-    <v-app-bar-title>프루덴셜 고객이력관리</v-app-bar-title>
+    <v-app-bar-title>프루덴셜 고객관리</v-app-bar-title>
     <v-spacer></v-spacer>
 
     <v-menu
