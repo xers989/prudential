@@ -29,7 +29,7 @@
             <v-card-text>
               <v-container>
                 <v-row>
-                  <v-col cols="15" sm="6" md="4">
+                  <v-col cols="10" sm="6" md="4">
                     <v-text-field
                       v-model="editedItem.customer_manage_type"
                       label="고객정보관리유형"
@@ -57,7 +57,7 @@
                 </v-row>
 
                 <v-row>
-                  <v-col cols="15" sm="6" md="4">
+                  <v-col cols="10" sm="6" md="4">
                     <v-text-field
                       v-model="editedItem.event_channel"
                       label="이벤트발생채널"
@@ -67,7 +67,7 @@
                 </v-row>
               
                 <v-row>
-                  <v-col cols="15" sm="6" md="4">
+                  <v-col cols="10" sm="6" md="4">
                     <v-text-field
                       v-model="editedItem.process_date"
                       label="처리일자"
@@ -77,7 +77,7 @@
                 </v-row>
 
                 <v-row>
-                  <v-col cols="15" sm="6" md="4">
+                  <v-col cols="10" sm="6" md="4">
                     <v-text-field
                       v-model="editedItem.process_owner"
                       label="처리담당자"
@@ -87,7 +87,7 @@
                 </v-row>
 
                 <v-row>
-                  <v-col cols="12" sm="6" md="4">
+                  <v-col cols="15" sm="6" md="4">
                     
                   </v-col>
                 </v-row>
